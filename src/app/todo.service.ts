@@ -8,80 +8,64 @@ import { Observable, of } from 'rxjs';
   providedIn: 'root',
 })
 export class TodoService {
-  private todoUrl = 'api/todoList';
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-  };
-
-  constructor(private http: HttpClient) {}
+  // no call api
+  todoList: Todo[] = [
+    { id: 1, name: 'Chinese' },
+    { id: 2, name: 'English' },
+    { id: 3, name: 'Japanese' },
+  ];
 
   // get todoList
-  getTodoList(): Observable<Todo[]> {
-    return this.http.get<Todo[]>(this.todoUrl).pipe(
-      tap((_) => console.log('Success')),
-      catchError(this.handleError<Todo[]>('getTodo', []))
-    );
+  getTodoList(): Todo[] {
+    return this.todoList;
   }
 
   // get detail todo
-  getDetailTodo(id: Number): Observable<Todo> {
-    return this.http.get<Todo>(`${this.todoUrl}/${id}`).pipe(
-      tap((_) => console.log('Success detail')),
-      catchError(this.handleError<Todo>('Detail todo'))
-    );
+  getTodoDetail(id: Number): Todo {
+    // default is todo Chinese selected
+    const todo = { id: 1, name: 'Chinese' };
+    const todoSelected = this.todoList.find((todo) => todo.id === id) || todo;
+    return todoSelected;
   }
 
   // add todoList
-  addTodoList(todo: Todo): Observable<Todo> {
-    return this.http.post<Todo>(this.todoUrl, todo, this.httpOptions).pipe(
-      tap((newTodo: Todo) => console.log('Add Success', newTodo)),
-      catchError(this.handleError<Todo>('addTodo'))
-    );
+  addTodoList(name: string): void {
+    const id = this.todoList[this.todoList.length - 1].id + 1;
+    this.todoList.push({
+      id,
+      name,
+    });
   }
 
   // update todoList
-  updateTodo(todo: Todo): Observable<any> {
-    return this.http.put(this.todoUrl, todo, this.httpOptions).pipe(
-      tap((_) => console.log(`updated todo id=${todo.id}`)),
-      catchError(this.handleError<any>('updateTodo'))
-    );
+  updateTodo(todoUpdate: Todo): void {
+    this.todoList.forEach((todo) => {
+      if (todo.id === todoUpdate.id) {
+        todo.name = todoUpdate.name;
+      }
+    });
   }
 
   //delete todoList
-  deleteTodo(todoId: Number): Observable<Todo> {
-    const urlDelete = `${this.todoUrl}/${todoId}`;
-    return this.http.delete<Todo>(urlDelete, this.httpOptions).pipe(
-      tap((_) => console.log('Delete Success')),
-      catchError(this.handleError<Todo>('deleteTodo'))
-    );
+  deleteTodo(id: Number): void {
+    this.todoList = this.todoList.filter((todo) => todo.id !== id);
   }
 
   //search Todo list
-  searchTodo(term: String): Observable<Todo[]> {
+  searchTodo(term: string): Todo[] {
     if (!term.trim()) {
-      return of([]);
+      return this.todoList;
     }
+    let resultFind: Todo[] = [];
+    this.todoList.forEach((todo) => {
+      if (
+        todo.name.includes(term.toLowerCase()) ||
+        todo.name.includes(term.toUpperCase())
+      ) {
+        resultFind.push(todo);
+      }
+    });
 
-    return this.http.get<Todo[]>(`${this.todoUrl}/?name=${term}`).pipe(
-      tap((todo) => console.log('Search Success', todo)),
-      catchError(this.handleError<Todo[]>('searchTodo', []))
-    );
-  }
-
-  /**
-   * Handle Http operation that failed.
-   * Let the app continue.
-   *
-   * @param operation - name of the operation that failed
-   * @param result - optional value to return as the observable result
-   */
-  private handleError<T>(operation = 'operation', result?: T) {
-    return (error: any): Observable<T> => {
-      // TODO: send the error to remote logging infrastructure
-      console.error(error); // log to console instead
-
-      // Let the app keep running by returning an empty result.
-      return of(result as T);
-    };
+    return resultFind;
   }
 }

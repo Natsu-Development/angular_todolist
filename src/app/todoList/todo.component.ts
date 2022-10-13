@@ -11,27 +11,17 @@ import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
   styleUrls: ['./todo.component.scss'],
 })
 export class TodoComponent implements OnInit {
-  todoList: Todo[] = [
-    { id: 1, name: 'Chinese' },
-    { id: 2, name: 'English' },
-    { id: 3, name: 'Japanese' },
-  ];
-
-  // search
-  todoSearch$!: Observable<Todo[]>;
-  private searchTerms = new Subject<string>();
+  todoList: Todo[] = [];
 
   constructor(private todoService: TodoService) {}
 
   search(term: string): void {
-    this.searchTerms.next(term);
+    this.todoList = this.todoService.searchTodo(term);
   }
 
   // display todo list
   getTodoList(): void {
-    this.todoService.getTodoList().subscribe((todoList) => {
-      this.todoList = todoList;
-    });
+    this.todoList = this.todoService.getTodoList();
   }
 
   // add todo list
@@ -40,27 +30,17 @@ export class TodoComponent implements OnInit {
     if (!name) {
       return;
     }
-    this.todoService.addTodoList({ name } as Todo).subscribe((todo) => {
-      this.todoList.push(todo);
-    });
+    this.todoService.addTodoList(name);
+    this.getTodoList();
   }
 
   // delete todo list
-  delete(todoDelete: Todo): void {
-    this.todoList = this.todoList.filter((todo) => todo !== todoDelete);
-    //this.todoService.deleteTodo(todoDelete.id).subscribe();
+  delete(id: Number): void {
+    this.todoService.deleteTodo(id);
+    this.getTodoList();
   }
 
   ngOnInit(): void {
     this.getTodoList();
-    this.todoSearch$ = this.searchTerms.pipe(
-      debounceTime(300),
-
-      // ignore new term if same as previous term
-      distinctUntilChanged(),
-
-      // switch to new search observable each time the term changes
-      switchMap((term: string) => this.todoService.searchTodo(term))
-    );
   }
 }

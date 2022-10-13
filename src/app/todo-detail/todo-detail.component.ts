@@ -19,13 +19,9 @@ export class TodoDetailComponent implements OnInit {
 
   @Input() todo?: Todo;
 
-  ngOnInit(): void {
-    this.getTodo();
-  }
-
   getTodo(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
-    this.todoService.getDetailTodo(id).subscribe((todo) => (this.todo = todo));
+    this.todo = this.todoService.getTodoDetail(id);
   }
 
   goBack(): void {
@@ -34,7 +30,12 @@ export class TodoDetailComponent implements OnInit {
 
   save(): void {
     if (this.todo) {
-      this.todoService.updateTodo(this.todo).subscribe(() => this.goBack());
+      this.todoService.updateTodo(this.todo);
+      this.goBack();
     }
+  }
+
+  ngOnInit(): void {
+    this.getTodo();
   }
 }
