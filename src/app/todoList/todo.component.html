@@ -1,0 +1,33 @@
+<div class="wrap__todolist">
+    <div class="todo">
+      <h1 class="todo__title">TodoList Application</h1>
+      <div class="todo__search">
+        <input #searchTodo class="input" placeholder="Enter the todo to search" (input)="search(searchTodo.value)"/>
+      </div>
+      <ul class="todo__list" *ngIf="todoSearch$">
+        <li *ngFor="let todo of todoSearch$ | async">
+          <a routerLink="/detail/{{todo.id}}" class="todo__list-item">
+            <span>{{todo.name}}</span>
+          </a>
+          <button class="btn btnDelete" title="delete todo" (click)="delete(todo)">x</button>
+        </li>
+      </ul>
+      <div class="border">
+      </div>
+
+      <!-- display -->
+      <ul class="todo__list" *ngIf="todoList">
+        <li *ngFor="let todo of todoList">
+          <a routerLink="/detail/{{todo.id}}" class="todo__list-item">
+            <span>{{todo.name}}</span>
+          </a>
+          <button class="btn btnDelete" title="delete todo" (click)="delete(todo)">x</button>
+        </li>
+      </ul>
+    </div>
+    <div class="todo__add">
+      <input type="text" class="input" placeholder="Enter the name of TodoList" #todoName/>
+      <button class="btn btnAdd" (click)="add(todoName.value); todoName.value = ''">Add Todo</button>
+    </div>
+</div>
+  

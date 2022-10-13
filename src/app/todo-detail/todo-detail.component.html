@@ -1,0 +1,8 @@
+<div *ngIf="todo" class="todoDetail">
+    <h2>{{todo.name | uppercase}} Details</h2>
+    <div>
+      <label for="hero-name" class="todoDetail__label">Todo name: </label>
+      <input id="hero-name" [(ngModel)]="todo.name" placeholder="name">
+    </div>
+    <button type="button" (click)="save()" class="btn btnSave">Save</button>
+</div>
